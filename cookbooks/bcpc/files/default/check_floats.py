@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
-"""Check that the floats nova assigned on the local host are same
-as those in the routing tables.
-
-Standard nova-like options.
-Returns a little json
+"""
 
 """
 
-
 def get_nova_floats(username, password, tenant, auth_url):
-   """Query nova for the current hosted floats. Results a *set*
+   """Query nova for the locally hosted floats. Results a *set*
    of ips. 
    """
    from novaclient.v1_1 import client
@@ -19,6 +14,7 @@ def get_nova_floats(username, password, tenant, auth_url):
             
 
 def get_iptables_floats(cidr, interface):
+   """Parse ip addr, returns a *set* of all ips on interface"""
    import netaddr
    import subprocess 
    ipn = netaddr.IPNetwork(cidr)
@@ -39,7 +35,6 @@ def get_iptables_floats(cidr, interface):
       
 
 if __name__ == '__main__':
-   
    from optparse import OptionParser 
    import sys
    import os
