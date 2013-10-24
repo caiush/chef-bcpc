@@ -1,5 +1,5 @@
 #
-# Openstack quouta monitoring 
+# Openstack quota monitoring 
 #
 UserParameter=openstack.cinder.quota,HOME=/var/lib/zabbix mysql -u<%="#{get_config('mysql-cinder-user')}"%> --password=<%="#{get_config('mysql-cinder-password')}"%>  cinder -e 'select coalesce(sum(hard_limit),0) from quotas where resource="gigabytes";' | tail -n1
 UserParameter=openstack.cinder.quota_usage,HOME=/var/lib/zabbix mysql -u<%="#{get_config('mysql-cinder-user')}"%> --password=<%="#{get_config('mysql-cinder-password')}"%> cinder  -e 'select coalesce(sum(in_use),0) from quota_usages where resource="gigabytes";' | tail -n1
