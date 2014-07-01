@@ -63,7 +63,7 @@ template "/etc/init/zabbix-server.conf" do
     owner "root"
     group "root"
     mode 00644
-    notifies :restart, "service[zabbix-server]", :delayed
+    notifies :run, "bash[enable-zabbix]", :delayed 
 end
 
 template "/usr/local/etc/zabbix_server.conf" do
@@ -71,7 +71,7 @@ template "/usr/local/etc/zabbix_server.conf" do
     owner node['bcpc']['zabbix']['user']
     group "root"
     mode 00600
-    notifies :restart, "service[zabbix-server]", :delayed
+    notifies :run, "bash[enable-zabbix]", :delayed
 end
 
 ruby_block "zabbix-database-creation" do
@@ -93,9 +93,12 @@ ruby_block "zabbix-database-creation" do
     end
 end
 
-service "zabbix-server" do
-    provider Chef::Provider::Service::Upstart
-    action [:enable, :start]
+bash "enable-zabbix" do 
+     code <<-EOH
+       if_vip restart zabbix-server
+       if_not_vip stop zabbix-server || true
+     EOH
+     action :nothing 
 end
 
 %w{traceroute php5-mysql php5-gd python-requests}.each do |pkg|
