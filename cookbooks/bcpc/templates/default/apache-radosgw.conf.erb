@@ -9,16 +9,16 @@ NameVirtualHost <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['a
 
 Listen <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
 Listen <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
-Listen <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
-Listen <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
+#Listen <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
+#Listen <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
 
 FastCgiExternalServer /var/www/s3gw.fcgi -socket /var/lib/ceph/radosgw/rgw_fcgi.sock -idle-timeout 60
 
-<VirtualHost  <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%> >
+<VirtualHost  <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>  >
 	    ServerName <%="s3.#{node['bcpc']['domain_name']}"%>
         ServerAlias <%=node['hostname']%>
         ServerAlias <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
-				ServerAlias <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
+#				ServerAlias <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw']}"%>
         ServerAdmin <%=node['bcpc']['admin_email']%>
         DocumentRoot /var/www
 	
@@ -43,10 +43,10 @@ FastCgiExternalServer /var/www/s3gw.fcgi -socket /var/lib/ceph/radosgw/rgw_fcgi.
 NameVirtualHost <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
 
 <VirtualHost  <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%> >
-	    ServerName <%="s3.#{node['bcpc']['domain_name']}"%>
+	ServerName <%="s3.#{node['bcpc']['domain_name']}"%>
         ServerAlias <%=node['hostname']%>
         ServerAlias <%="#{node['bcpc']['floating']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
-				ServerAlias <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
+#	ServerAlias <%="#{node['bcpc']['metadata']['ip']}:#{node['bcpc']['ports']['apache']['radosgw_https']}"%>
         ServerAdmin <%=node['bcpc']['admin_email']%>
         DocumentRoot /var/www
 
