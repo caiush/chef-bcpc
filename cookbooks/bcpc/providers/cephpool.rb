@@ -9,7 +9,8 @@ action :create do
     Chef::Log.info "#{ @new_resource } already exists"
     if (@current_resource.pgp_num != @new_resource.pg_num and @new_resource.change_pg and @new_resource.change_pgp) or
       (@current_resource.pg_num < @new_resource.pg_num  and  @new_resource.change_pg ) or
-      ( @current_resource.replicas != @new_resource.replicas)
+      ( @current_resource.replicas != @new_resource.replicas) or
+      (@current_resource.ruleset != @new_resource.ruleset)
       converge_by("Resetting pg(p)_num") do
         reset_pgs
       end
@@ -41,16 +42,16 @@ def load_current_resource
 	@current_resource.pgp_num = `ceph osd pool get #{@new_resource.name} pgp_num | awk '{}{print $2}' | tr -d '\n'`.to_i
 	@current_resource.ruleset(`ceph osd pool get #{@new_resource.name} crush_ruleset | awk '{}{print $2}' | tr -d '\n'`.to_i)
   end
- end
+end
 
- def create_pool
-    %x[ceph osd pool create #{new_resource.name} #{new_resource.pg_num}]
-    %x[ceph osd pool set #{new_resource.name} crush_ruleset #{new_resource.ruleset}]    
-    %x[ceph osd pool set #{new_resource.name} size #{new_resource.replicas}]
- end
+def create_pool
+    system("ceph osd pool create #{new_resource.name} #{new_resource.pg_num}")
+    system("ceph osd pool set #{new_resource.name} crush_ruleset #{new_resource.ruleset}")    
+    system("ceph osd pool set #{new_resource.name} size #{new_resource.replicas}")
+end
 
 def delete_pool
-     %x[ceph osd pool create #{new_resource.name}  #{new_resource.name} --yes-i-really-really-mean-it]
+     system("ceph osd pool create #{new_resource.name}  #{new_resource.name} --yes-i-really-really-mean-it")
 end
 
 def wait_for_pg_created
@@ -62,15 +63,19 @@ end
 
 def reset_pgs
   if  @new_resource.change_pg and (@current_resource.pg_num < @new_resource.pg_num)
-    %x[ceph osd pool set #{new_resource.name} pg_num #{new_resource.pg_num}]    
+    system("ceph osd pool set #{new_resource.name} pg_num #{new_resource.pg_num}")    
     wait_for_pg_created
   end
   if  @new_resource.change_pg and @new_resource.change_pgp and (@current_resource.pgp_num != @new_resource.pg_num)
-     %x[ceph osd pool set #{new_resource.name} pgp_num #{new_resource.pg_num}]    
+    system("ceph osd pool set #{new_resource.name} pgp_num #{new_resource.pg_num}")    
     wait_for_pg_created
   end
   if @current_resource.replicas != @new_resource.replicas
-    %x[ceph osd pool set #{new_resource.name} size #{new_resource.replicas}]    
+    system("ceph osd pool set #{new_resource.name} size #{new_resource.replicas}")    
   end
- end
+  if @current_resource.ruleset != @new_resource.ruleset
+    system("ceph osd pool set #{new_resource.name} crush_ruleset #{new_resource.ruleset}")    
+  end
+
+end
 
