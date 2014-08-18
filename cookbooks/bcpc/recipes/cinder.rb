@@ -29,7 +29,7 @@ ruby_block "initialize-cinder-config" do
     end
 end
 
-%w{cinder-api cinder-volume cinder-scheduler}.each do |pkg|
+%w{cinder-api cinder-volume cinder-scheduler cinder-backup}.each do |pkg|
     package pkg do
         action :upgrade
     end
@@ -50,6 +50,7 @@ template "/etc/cinder/cinder.conf" do
     notifies :restart, "service[cinder-api]", :delayed
     notifies :restart, "service[cinder-volume]", :delayed
     notifies :restart, "service[cinder-scheduler]", :delayed
+    notifies :restart, "service[cinder-backup]", :delayed
 end
 
 ruby_block "cinder-database-creation" do
@@ -73,6 +74,7 @@ bash "cinder-database-sync" do
     notifies :restart, "service[cinder-api]", :immediately
     notifies :restart, "service[cinder-volume]", :immediately
     notifies :restart, "service[cinder-scheduler]", :immediately
+    notifies :restart, "service[cinder-backup]", :immediately
 end
 
 node['bcpc']['ceph']['enabled_pools'].each do |type|
@@ -94,6 +96,15 @@ node['bcpc']['ceph']['enabled_pools'].each do |type|
         not_if ". /root/adminrc; cinder type-list | grep #{type.upcase}"
     end
 end
+
+bcpc_cephpool "backups" do
+    action :create
+    ruleset node['bcpc']['ceph']['ssd']['ruleset']
+    pg_num 16
+    replicas [get_all_nodes.length, node['bcpc']['ceph']['volumes']['replicas']].min
+    change_pgp node['bcpc']['ceph']['pgp_auto_adjust']
+end
+
 
 service "tgt" do
     action [:stop, :disable]

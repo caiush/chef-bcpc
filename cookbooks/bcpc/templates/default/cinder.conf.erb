@@ -49,6 +49,11 @@ enabled_backends=<%= node['bcpc']['ceph']['enabled_pools'].map {|type| type.upca
 control_exchange = cinder
 notification_driver = cinder.openstack.common.notifier.rpc_notifier
 
+# Backup
+backup_driver=cinder.backup.drivers.ceph
+backup_ceph_pool=backups
+backup_ceph_user=admin
+
 [ssl]
 ca_file = /etc/ssl/certs/ssl-bcpc.pem
 
