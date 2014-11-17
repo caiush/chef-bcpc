@@ -66,10 +66,16 @@ ruby_block 'write-ceph-mon-key' do
     not_if "test -f /etc/ceph/ceph.mon.keyring"
 end
 
+service "ceph-all" do
+  provider Chef::Provider::Service::Upstart
+  action :nothing
+end
+
 template '/etc/ceph/ceph.conf' do
     source 'ceph.conf.erb'
     mode '0644'
     variables(:servers => get_head_nodes)
+    notifies :restart, "service[ceph-all]", :delayed 
 end
 
 bash "wait-for-pgs-creating" do
