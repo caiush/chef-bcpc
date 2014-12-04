@@ -1,0 +1,11 @@
+
+<Plugin python>
+	Import "openstack/keystone_plugin"
+	<Module keystone_plugin>
+	  Username "<%= #{get_config('keystone-admin-user')} %>"
+          Password '<%="#{get_config('keystone-admin-password')}"%>'
+          TenantName '<%=@node['bcpc']['admin_tenant']%>'
+          AuthURL 'https://<%="#{node[:bcpc][:management][:vip]}"%>:5000/v2.0/'
+          Verbose "False"
+	</Module>
+</Plugin>

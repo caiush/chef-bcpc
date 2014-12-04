@@ -1,0 +1,10 @@
+
+<Plugin python>
+	Import "collectd-ceph"
+	<Module collectd-ceph>
+	    SocketPath "/var/run/ceph"
+	    Suffix ".asok"
+	    CephPath "/usr/bin/ceph"
+            LogRawAverages false
+	</Module>
+</Plugin>

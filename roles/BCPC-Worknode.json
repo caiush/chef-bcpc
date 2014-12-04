@@ -16,6 +16,7 @@
       "recipe[bcpc::nova-work]",
       "recipe[bcpc::diamond]",
       "recipe[bcpc::fluentd]",
+      "recipe[bcpc-monitoring::collectd-work]",  	
       "recipe[bcpc::zabbix-work]"
     ],
     "description": "A functional compute node in a BCPC cluster",
