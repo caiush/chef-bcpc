@@ -44,10 +44,8 @@ ruby_block "initialize-keystone-config" do
     end
 end
 
-%w{keystone memcached}.each do |pkg|
-    package pkg do
-        action :upgrade
-    end
+package 'keystone' do
+    action :upgrade
 end
 
 template "/etc/keystone/keystone.conf" do
@@ -55,6 +53,10 @@ template "/etc/keystone/keystone.conf" do
     owner "keystone"
     group "keystone"
     mode 00600
+    variables({
+      :servers => get_head_nodes,
+      :rabbit_hosts_shuffle_rng => Random.new(IPAddr.new(node['bcpc']['management']['ip']).to_i),
+    })
     notifies :restart, "service[apache2]", :delayed
 end
 
