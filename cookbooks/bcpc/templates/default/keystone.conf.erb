@@ -480,7 +480,7 @@ log_dir = /var/log/keystone
 #
 
 # Keystone Assignment backend driver. (string value)
-#driver=<None>
+driver=keystone.identity.backends.sql.Assignment
 
 # Toggle for assignment caching. This has no effect unless
 # global caching is enabled. (boolean value)
@@ -777,7 +777,7 @@ driver=keystone.identity.backends.<%=node['bcpc']['keystone']['backend']%>.Ident
 
 # Maximum number of entities that will be returned in an
 # identity collection. (integer value)
-#list_limit=<None>
+list_limit=100
 
 
 [kvs]
@@ -812,28 +812,28 @@ driver=keystone.identity.backends.<%=node['bcpc']['keystone']['backend']%>.Ident
 #
 # Options defined in keystone
 #
-
+<% if @node["bcpc"]["keystone"]["backend"] %>
 # URL for connecting to the LDAP server. (string value)
-url=ldap://<%=@node["bcpc"]["management"]["vip"]%>
+url=ldap://<%=@node["bcpc"]["ldap"]["ip"]%>
 
 # User BindDN to query the LDAP server. (string value)
-user=<%=get_config('389ds-rootdn-user')%>
+user=<%=@node["bcpc"]["ldap"]["user"]%>
 
 # Password for the BindDN to query the LDAP server. (string
 # value)
-password=<%=get_config('389ds-rootdn-password')%>
+password=<%=@node["bcpc"]["ldap"]["password"]%>
 
 # LDAP server suffix (string value)
-suffix=<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+suffix=<%=@node["bcpc"]["ldap"]["suffix"]%>
 
 # If true, will add a dummy member to groups. This is required
 # if the objectclass for groups requires the "member"
 # attribute. (boolean value)
-#use_dumb_member=false
+#use_dumb_member=True
 
 # DN of the "dummy member" to use when "use_dumb_member" is
 # enabled. (string value)
-#dumb_member=cn=dumb,dc=nonexistent
+#dumb_member=<%=@node["bcpc"]["ldap"]["dum_member"]%>
 
 # allow deleting subtrees. (boolean value)
 #allow_subtree_delete=false
@@ -841,11 +841,11 @@ suffix=<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join('
 # The LDAP scope for queries, this can be either "one"
 # (onelevel/singleLevel) or "sub" (subtree/wholeSubtree).
 # (string value)
-query_scope=sub
+query_scope=one
 
 # Maximum results per page; a value of zero ("0") disables
 # paging. (integer value)
-#page_size=0
+page_size=100
 
 # The LDAP dereferencing option for queries. This can be
 # either "never", "searching", "always", "finding" or
@@ -858,25 +858,25 @@ query_scope=sub
 #chase_referrals=<None>
 
 # Search base for users. (string value)
-user_tree_dn=ou=People,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+user_tree_dn=<%=@node["bcpc"]["ldap"]["user_tree"]%>
 
 # LDAP search filter for users. (string value)
 #user_filter=<None>
 
 # LDAP objectClass for users. (string value)
-#user_objectclass=inetOrgPerson
+user_objectclass=person
 
 # LDAP attribute mapped to user id. (string value)
-#user_id_attribute=cn
+user_id_attribute=<%=@node["bcpc"]["ldap"]["user_id_attribute"]%>
 
 # LDAP attribute mapped to user name. (string value)
-#user_name_attribute=sn
+user_name_attribute=<%=@node["bcpc"]["ldap"]["user_name_attribute"]%>
 
 # LDAP attribute mapped to user email. (string value)
 user_mail_attribute=mail
 
 # LDAP attribute mapped to password. (string value)
-#user_pass_attribute=userPassword
+user_pass_attribute=
 
 # LDAP attribute mapped to user enabled flag. (string value)
 #user_enabled_attribute=enabled
@@ -907,22 +907,22 @@ user_mail_attribute=mail
 #user_default_project_id_attribute=<None>
 
 # Allow user creation in LDAP backend. (boolean value)
-#user_allow_create=true
+user_allow_create=<%=@node['bcpc']['ldap']['user_allow_create']%>
 
 # Allow user updates in LDAP backend. (boolean value)
-#user_allow_update=true
+user_allow_update=<%=@node['bcpc']['ldap']['user_allow_update']%>
 
 # Allow user deletion in LDAP backend. (boolean value)
-#user_allow_delete=true
+user_allow_delete=<%=@node['bcpc']['ldap']['user_allow_delete']%>
 
 # If True, Keystone uses an alternative method to determine if
 # a user is enabled or not by checking if they are a member of
 # the "user_enabled_emulation_dn" group. (boolean value)
-user_enabled_emulation=true
+#user_enabled_emulation=flase
 
 # DN of the group entry to hold enabled users when using
 # enabled emulation. (string value)
-user_enabled_emulation_dn=cn=OpenStack Users,ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+#user_enabled_emulation_dn=cn=OpenStack Users,ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
 
 # List of additional LDAP attributes used for mapping
 # Additional attribute mappings for users. Attribute mapping
@@ -932,7 +932,7 @@ user_enabled_emulation_dn=cn=OpenStack Users,ou=Groups,<%= node['bcpc']['domain_
 #user_additional_attribute_mapping=
 
 # Search base for projects (string value)
-project_tree_dn=ou=Tenants,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+#project_tree_dn=ou=Tenants,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
 
 # LDAP search filter for projects. (string value)
 #tenant_filter=<None>
@@ -975,11 +975,11 @@ project_tree_dn=ou=Tenants,<%= node['bcpc']['domain_name'].split('.').collect { 
 # If True, Keystone uses an alternative method to determine if
 # a project is enabled or not by checking if they are a member
 # of the "tenant_enabled_emulation_dn" group. (boolean value)
-project_enabled_emulation=true
+#project_enabled_emulation=true
 
 # DN of the group entry to hold enabled projects when using
 # enabled emulation. (string value)
-project_enabled_emulation_dn=cn=OpenStack Tenants,ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+#project_enabled_emulation_dn=cn=OpenStack Tenants,ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
 
 # Additional attribute mappings for projects. Attribute
 # mapping format is <ldap_attr>:<user_attr>, where ldap_attr
@@ -988,7 +988,7 @@ project_enabled_emulation_dn=cn=OpenStack Tenants,ou=Groups,<%= node['bcpc']['do
 #tenant_additional_attribute_mapping=
 
 # Search base for roles. (string value)
-role_tree_dn=ou=Roles,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+#role_tree_dn=ou=Roles,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
 
 # LDAP search filter for roles. (string value)
 #role_filter=<None>
@@ -1025,7 +1025,7 @@ role_tree_dn=ou=Roles,<%= node['bcpc']['domain_name'].split('.').collect { |x| '
 #role_additional_attribute_mapping=
 
 # Search base for groups. (string value)
-group_tree_dn=ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
+#group_tree_dn=ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x| 'dc='+x }.join(',') %>
 
 # LDAP search filter for groups. (string value)
 #group_filter=<None>
@@ -1080,6 +1080,8 @@ group_tree_dn=ou=Groups,<%= node['bcpc']['domain_name'].split('.').collect { |x|
 # valid options for tls_req_cert are demand, never, and allow.
 # (string value)
 #tls_req_cert=demand
+
+<% end %> 
 
 
 [matchmaker_ring]
