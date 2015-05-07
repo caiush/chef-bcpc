@@ -56,6 +56,17 @@ default['bcpc']['enabled']['secure_fixed_networks'] = true
 # This can be either 'sql' or 'ldap' to either store identities
 # in the mysql DB or the LDAP server
 default['bcpc']['keystone']['backend'] = 'ldap'
+default['bcpc']['ldap']['ip'] = '127.0.0.1'
+default['bcpc']['ldap']['user'] = 'bob'
+default['bcpc']['ldap']['password'] = 'secret'
+default['bcpc']['ldap']['suffix'] = "DC=example,DC=com"
+default['bcpc']['ldap']['user_tree'] = "OU=People,DC=example,DC=com"
+default['bcpc']['ldap']['user_id_attribute'] = "uid"
+default['bcpc']['ldap']['user_name_attribute'] = "name"
+default['bcpc']['ldap']['user_allow_create'] = "false"
+default['bcpc']['ldap']['user_allow_update'] = "false"
+default['bcpc']['ldap']['user_allow_delete'] = "false"
+
 
 # If radosgw_cache is enabled, default to 20MB max file size
 default['bcpc']['radosgw']['cache_max_file_size'] = 20000000
