@@ -12,13 +12,8 @@
       "recipe[bcpc::networking-gw-test]",
       "recipe[bcpc::networking-route-test]",
       "recipe[bcpc::ceph-work]",
-      "role[BCPC-Rgwnode]",
-      "recipe[bcpc::nova-work]",
-      "recipe[bcpc::diamond]",
-      "recipe[bcpc::fluentd]",
-      "recipe[bcpc::tpm]",
-      "recipe[bcpc::checks-work]",
-      "recipe[bcpc::zabbix-agent]"
+      "recipe[bcpc::calico]",
+      "recipe[bcpc::nova-work]"
     ],
     "description": "A functional compute node in a BCPC cluster",
     "chef_type": "role",
